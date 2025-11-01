@@ -58,6 +58,20 @@ function Chat({ userPhone, onLogout, socket }) {
     e.preventDefault();
     if (!receiver || !message.trim()) return;
 
+    const msgData = {
+      sender: userPhone,
+      text: message,
+      time: new Date().toLocaleTimeString()
+    };
+
+    // Optimistically update chatData for immediate UI feedback
+    setChatData(prev => {
+      const updated = { ...prev };
+      if (!updated[receiver]) updated[receiver] = [];
+      updated[receiver].push(msgData);
+      return updated;
+    });
+
     socket.emit('sendMessage', { sender: userPhone, receiver, text: message });
     setMessage("");
     setSelectedChat(receiver);
