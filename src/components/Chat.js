@@ -38,19 +38,8 @@ function Chat({ userPhone, onLogout, socket }) {
       });
     });
 
-    socket.on('messageSent', (msgData) => {
-      setChatData(prev => {
-        const updated = { ...prev };
-        const other = msgData.receiver;
-        if (!updated[other]) updated[other] = [];
-        updated[other].push(msgData);
-        return updated;
-      });
-    });
-
     return () => {
       socket.off('receiveMessage');
-      socket.off('messageSent');
     };
   }, [socket, userPhone]);
 

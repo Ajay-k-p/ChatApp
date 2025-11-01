@@ -182,8 +182,8 @@ io.on('connection', (socket) => {
     };
     // Emit to receiver if online
     io.to(receiver).emit('receiveMessage', msgData);
-    // Also emit back to sender for confirmation
-    socket.emit('messageSent', { ...msgData, receiver });
+    // Emit back to sender for consistency
+    socket.emit('receiveMessage', msgData);
   });
 
   socket.on('disconnect', () => {
