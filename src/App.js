@@ -26,7 +26,7 @@ function App() {
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
+        body: JSON.stringify({ phone, name, password })
       });
       const data = await response.json();
       if (data.success) {
@@ -47,6 +47,24 @@ function App() {
     }
   };
 
+  const handleRegister = async ({ phone, name, password }) => {
+    try {
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, name, password })
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Registration successful! Please login.');
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      alert('Registration failed');
+    }
+  };
+
   const handleLogout = () => {
     setLoggedIn(false);
     setUserPhone("");
@@ -59,7 +77,7 @@ function App() {
       {loggedIn ? (
         <Chat userPhone={userPhone} userName={userName} onLogout={handleLogout} socket={socket} />
       ) : (
-        <Login onLogin={handleLogin} />
+        <Login onLogin={handleLogin} onRegister={handleRegister} />
       )}
     </div>
   );

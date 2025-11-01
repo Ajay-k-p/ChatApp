@@ -29,19 +29,43 @@ const db = admin.database();
 const activeUsers = new Map();
 
 // API Routes
+app.post('/register', async (req, res) => {
+  const { phone, name, password } = req.body;
+  try {
+    const userRef = db.ref(`users/${phone}`);
+    const snapshot = await userRef.once('value');
+    const user = snapshot.val();
+
+    if (user) {
+      return res.status(400).json({ error: 'Phone number already registered' });
+    }
+
+    await userRef.set({ phone, name, password, role: 'user' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/login', async (req, res) => {
-  const { phone } = req.body;
+  const { phone, name, password } = req.body;
   try {
     const userRef = db.ref(`users/${phone}`);
     const snapshot = await userRef.once('value');
     const user = snapshot.val();
 
     if (!user) {
-      await userRef.set({ phone, role: 'user' });
+      return res.status(400).json({ error: 'User not found. Please register first.' });
     }
+
+    if (user.password !== password) {
+      return res.status(400).json({ error: 'Invalid password' });
+    }
+
     if (activeUsers.has(phone)) {
       return res.status(400).json({ error: 'User already logged in' });
     }
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
